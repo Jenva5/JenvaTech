@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JenvaTech | Your Electronic Gadgets Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  
+    <header class="header">
+        <div class="container flex-between">
+          <h1 class="logo"><i class="fas fa-store"></i> JenvGadgets</h1>
+          
+          <nav class="navbar">
+            <a href="{{ url_for('home') }}">
+              <i class="fas fa-home"></i> Home
+            </a>
+            
+            
+            
+            {% if session.get('user') %}
+
+            <a href="{{ url_for('products') }}">
+              <i class="fas fa-box-open"></i> Products
+            </a>
+            
+            <a href="{{ url_for('view_cart') }}">
+              <i class="fas fa-shopping-cart"></i> Cart
+            </a>
+              <div class="dropdown">
+                <a class="dropbtn">
+                  <i class="fas fa-user"></i> My Account <i class="fas fa-caret-down"></i>
+                </a>
+                <div class="dropdown-content">
+                  <a href="{{ url_for('account') }}"><i class="fas fa-id-badge"></i> Profile</a>
+                  <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+              </div>
+            {% else %}
+              <a href="{{ url_for('login') }}">
+                <i class="fas fa-sign-in-alt"></i> Login
+              </a>
+              <a href="{{ url_for('signin') }}">
+                <i class="fas fa-user-plus"></i> Register
+              </a>
+            {% endif %}
+            
+            {% if session.get('role') == 'admin' %}
+              <a href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-tools"></i> Admin
+              </a>
+            {% endif %}
+            
+          </nav>
+        </div>
+      </header>
+      
+
+    <main>
+        <section class="hero-section">
+            <div class="overlay"></div>
+            <div class="content">
+                <h1 class="headline">Explore the Future of Technology</h1>
+                <p class="subtext">From smartwatches to drones, experience the best in electronic gadgets at unbeatable prices.</p>
+                <a href="{{ url_for('products') }}" class="btn"></h2>Shop Now!</h2></a>
+            </div>
+        </section>
+
+        <!-- Recommended Products Section -->
+<section class="recommended-products container">
+    <h3 class="section-title">Recommended for You</h3>
+    <div class="product-carousel-track">
+        <div class="product-grid moving-grid">
+            {% for product in recommended %}
+                <div class="product-card">
+                    {% if product.image %}
+                        <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}">
+                    {% endif %}
+                    <h3>{{ product.name }}</h3>
+                </div>
+            {% endfor %}
+
+            {# Duplicate items for seamless loop #}
+            {% for product in recommended %}
+                <div class="product-card">
+                    {% if product.image %}
+                        <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}">
+                    {% endif %}
+                    <h3>{{ product.name }}</h3>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+
+        <!-- Features Section -->
+        <section class="features container">
+            <h3 class="section-title">Why Shop With Us?</h3>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <h4>Latest Tech</h4>
+                    <p>Stay ahead with the newest arrivals in mobile, computing, gaming, and smart gadgets.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>Trusted Brands</h4>
+                    <p>We stock original products from Apple, Samsung, Sony, Lenovo, and more.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>Secure Shopping</h4>
+                    <p>Shop confidently with secure checkout, encrypted payments, and easy returns.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="contact-section">
+            <div class="container text-center">
+                <h2>Contact Us</h2>
+                <p class="lead">Have a question or need help with your order? We're just a click away.</p>
+                <p>Email us at <a href="mailto:support@JenvaTech.com">support@JenvaTech.com</a> or call us at <strong>+250788959501</strong></p>
+                <p>Prefer to send a message? Fill out our <a href="/contact">contact form</a> and we’ll respond shortly.</p>
+            </div>
+        </section>
+    </main>
+
+
+    <footer class="footer text-center">
+        <p>&copy; 2025 JenvaTech. All rights reserved.</p>
+    </footer>
+  
+</body>
+</html>

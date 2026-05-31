@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="header">
+        <div class="container flex-between">
+            <h1 class="logo"><i class="fas fa-store"></i> JenvGadgets</h1>
+          
+            <nav class="navbar">
+                <a href="{{ url_for('home') }}">
+                    <i class="fas fa-home"></i> Home
+                  </a>
+                  <a href="{{ url_for('products') }}">
+                    <i class="fas fa-box-open"></i> Products
+                  </a>
+            </nav>
+        </div>
+    </header>
+    <main>
+        {% if cart %}
+            <center><h2>Your Cart</h2></center>
+            <div class="product-grid">
+           
+                {% set ns = namespace(grand_total=0) %}
+                {% for item in cart %}
+                    {% set item_total = item.price * item.quantity %}
+                    {% set ns.grand_total = ns.grand_total + item_total %}
+                    <div class="product-card">
+                        {% if item.image %}
+                            <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}">
+                        {% endif %}
+                        <h3>{{ item.name }}</h3>
+                        <p>Price: ${{ "%.2f"|format(item.price) }}</p>
+                        <p>Quantity: {{ item.quantity }}</p>
+                        <div class="cart-actions">
+                            <a href="{{ url_for('update_quantity', product_id=item.id, action='increase') }}">➕</a>
+                            <a href="{{ url_for('update_quantity', product_id=item.id, action='decrease') }}">➖</a>
+                            <a href="{{ url_for('remove_from_cart', product_id=item.id) }}">🗑️ Remove</a>
+                        </div>
+                        <p>Total: ${{ "%.2f"|format(item_total) }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+            </div>
+            <center>
+                <h3>TOTAL: ${{ "%.2f"|format(ns.grand_total) }}</h3>
+                <form action="{{ url_for('place_order') }}" method="POST">
+                    <button type="submit" class="btn btn-primary">Place Order</button>
+                </form>
+            </center>
+        {% else %}
+            <p><b>Your cart is empty.</b></p>
+        {% endif %}
+    </main>
+</body>
+</html>

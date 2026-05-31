@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Catalog</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        mark {
+            background-color:rgb(11, 176, 85);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        </style>
+</head>
+<body>
+ <header class="header"> 
+    <div class="container flex-between">
+        <h1 class="logo"><i class="fas fa-store"></i> JenvGadgets</h1>
+          
+        <nav class="navbar">
+            <a href="{{ url_for('home') }}">
+                <i class="fas fa-home"></i> Home
+              </a>
+              <a href="{{ url_for('products') }}">
+                <i class="fas fa-box-open"></i> Products
+              </a>
+            <a href="{{ url_for('view_cart') }}">
+                <i class="fas fa-shopping-cart"></i> Cart
+              </a>
+            {% if session.get('user') %}
+                <a href="{{ url_for('logout') }}">Logout</a>
+            
+            {% endif %}
+          </nav>
+    </div>
+  </header> <br/>
+  <form method="GET" action="{{ url_for('products') }}" class="search-form">
+    <input type="text" name="query" placeholder="Search products..." value="{{ request.args.get('query', '') }}">
+    <button type="submit">Search</button>
+</form>
+
+    <main> <br/>
+        <div class="product-grid">
+            {% for product in products %}
+                <div class="product-card">
+                    {% if product.image %}
+                        <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}">
+                    {% endif %}
+                    <h3>{{ product.name|highlight(search_query) }}</h3>
+                    <p>${{ "%.2f"|format(product.price) }}</p>
+                    <p>{{ product.description|highlight(search_query) }}</p>
+                    <a href="{{ url_for('add_to_cart', product_id=product.id) }}" class="btn">Add to Cart</a>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+</body>
+</html>

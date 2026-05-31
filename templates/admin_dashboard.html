@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background:rgb(221, 179, 179);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex: 1;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            box-shadow: 0 2px 5px rgba(28, 243, 31, 0.1);
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        input[type="text"], select {
+            padding: 6px;
+            margin-bottom: 20px;
+            margin-right: 10px;
+        }
+        canvas {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Admin Dashboard</h1>
+
+<div class="stats">
+    <div class="card">
+        <h3>Total Products</h3>
+        <p>{{ total_products }}</p>
+    </div>
+    <div class="card">
+        <h3>Total Users</h3>
+        <p>{{ total_users }}</p>
+    </div>
+    <div class="card">
+        <h3>Total Orders</h3>
+        <p>{{ total_orders }}</p>
+    </div>
+    <div class="card">
+        <h3>Pending Orders</h3>
+        <p>{{ pending_orders }}</p>
+    </div>
+</div>
+
+<h2>Order Overview Chart</h2>
+<canvas id="orderChart" width="600" height="300"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('orderChart');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Pending', 'Completed', 'Shipped', 'Cancelled'],
+            datasets: [{
+                label: 'Orders by Status',
+                data: [
+                    {{ pending_orders }},
+                    {{ completed_orders }},
+                    {{ shipped_orders }},
+                    {{ cancelled_orders }}
+                ],
+                backgroundColor: ['orange', 'green', 'blue', 'red'],
+                borderColor: ['darkorange', 'darkgreen', 'darkblue', 'darkred'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true
+                },
+                title: {
+                    display: true,
+                    text: 'Order Status Summary'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+<h2>All Orders</h2>
+
+<input type="text" id="searchBox" onkeyup="filterOrders()" placeholder="Search by user or product name">
+
+<table id="orderTable">
+  <thead>
+    <tr>
+        <th>Order ID</th>
+        <th>User</th>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Unit Price</th>
+        <th>Total Price</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Action</th> <!-- New column for updating status -->
+    </tr>
+  </thead>
+  <tbody>
+  {% for order in orders %}
+    <tr>
+      <td>{{ order.id }}</td>
+      <td>{{ order.user_email }}</td>
+      <td>{{ order.product_name }}</td>
+      <td>{{ order.quantity }}</td>
+      <td>${{ "%.2f"|format(order.price) }}</td>
+      <td>${{ "%.2f"|format(order.total_price) }}</td>
+      <td>
+        <form method="POST" action="{{ url_for('update_status', order_id=order.id) }}">
+          <select name="status" onchange="this.form.submit()">
+            <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+            <option value="Completed" {% if order.status == 'Completed' %}selected{% endif %}>Completed</option>
+            <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+            <option value="Cancelled" {% if order.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+          </select>
+        </form>
+      </td>
+      <td>{{ order.order_date }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<script>
+function filterOrders() {
+    let input = document.getElementById("searchBox").value.toLowerCase();
+    let rows = document.querySelectorAll("#orderTable tbody tr");
+
+    rows.forEach(row => {
+        let rowText = row.textContent.toLowerCase();
+        row.style.display = rowText.includes(input) ? "" : "none";
+    });
+}
+</script>
+
+
+</body>
+</html>
